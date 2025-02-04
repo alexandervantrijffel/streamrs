@@ -8,10 +8,9 @@ bilrost = "0"
 chrono = "0"
 fluvio = "0"
 futures = "0"
-nanoid = "0"
 serde = { version = "1", default-features = false, features = ["derive"] }
 time = { version = "0", features = ["serde", "parsing", "formatting", "macros"] }
-tokio = { version = "1",  features = ["full", "tracing", "macros", "rt-multi-thread","time"] }
+tokio = { version = "1",  default-features = false, features = ["full", "tracing", "macros", "time"] }
 tracing = "0"
 tracing-subscriber = {version = "0", features = ["env-filter"]}
 
