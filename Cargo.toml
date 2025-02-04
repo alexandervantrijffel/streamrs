@@ -1,0 +1,27 @@
+[workspace]
+resolver = "2"
+members = ["crates/bin/streamit"]
+
+[workspace.dependencies]
+anyhow = { version = "1", features = ["backtrace"] }
+fn-error-context = "0"
+nanoid = "0"
+serde = { version = "1", default-features = false, features = ["derive"] }
+tokio = { version = "1", default-features = false, features = ["tracing", "macros"] }
+tracing = "0"
+tracing-subscriber = { version = "0", features = ["env-filter", "fmt"] }
+
+[profile.dev]
+opt-level = 0 # Disable optimizations and reduce the compile time
+split-debuginfo = "unpacked" # improve compilation performance by using unpacked debug symbols
+
+[profile.release]
+lto = false # Disable link-time optimization to reduce build time
+codegen-units = 64 # Reduce number of codegen units to increase optimizations
+panic = 'abort'
+strip = true # Strip symbols from binary*
+opt-level = 3 # All optimizations
+incremental = true # shorten hot local builds duration
+
+[workspace.metadata]
+deny-unsafe-code = true

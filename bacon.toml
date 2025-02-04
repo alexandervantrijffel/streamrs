@@ -1,0 +1,49 @@
+default_job = "check"
+env.CARGO_TERM_COLOR = "always"
+
+[aliases]
+test = "bacon test-all-cranelift"
+run = "bacon streamit-cranelift"
+
+[jobs.test-all-cranelift]
+command = [
+  "cargo",
+  "+nightly",
+  "nextest",
+  "run",
+  "-Zcodegen-backend",
+  "--all-features",
+  "--verbose",
+  "--hide-progress-bar",
+  "--failure-output",
+  "final", # or immediate
+  # "--success-output",
+  # "immediate",
+  # "--",
+]
+
+# Run your long-running application (eg server) and have the result displayed in bacon.
+# For programs that never stop (eg a server), `background` is set to false
+# to have the cargo run output immediately displayed instead of waiting for
+# program's end.
+# 'on_change_strategy' is set to `kill_then_restart` to have your program restart
+# on every change (an alternative would be to use the 'F5' key manually in bacon).
+# If you often use this job, it makes sense to override the 'r' key by adding
+# a binding `r = job:run-long` at the end of this file .
+[jobs.streamit-cranelift]
+command = [
+  "cargo",
+  "+nightly",
+  "run",
+  "-Zcodegen-backend",
+  "--all-features",
+  # put launch parameters for your program behind a `--` separator
+  "--",
+  "-p",
+  "streamit"
+]
+need_stdout = true
+allow_warnings = true
+background = false
+on_change_strategy = "kill_then_restart"
+ignore = ["**/generated_at_build.rs"]
