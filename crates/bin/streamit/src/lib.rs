@@ -1,4 +1,3 @@
-mod birth;
 pub mod configure_tracing;
 pub mod consumer;
 pub mod message;
