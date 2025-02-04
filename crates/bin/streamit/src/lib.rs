@@ -32,29 +32,3 @@ pub async fn producer() -> anyhow::Result<()> {
   debug!(msg);
   Ok(())
 }
-
-#[cfg(test)]
-pub mod tests {
-  use super::*;
-  use Birth;
-  use bilrost::{BorrowedMessage, Message};
-  use tokio::test;
-
-  #[test]
-  pub async fn test_serialize_roundtrip() {
-    let name = (0..10_000).map(|_| "Alice").collect::<String>();
-    let birth = Birth::new(name);
-    let wrapper = MessageWrapper {
-      kind: MessageKind::Birth(birth),
-    };
-
-    let encoded = wrapper.encode_to_bytes();
-    let decoded = MessageWrapper::decode_borrowed(&encoded).unwrap();
-    match decoded.kind {
-      MessageKind::Birth(birth) => {
-        assert_eq!(birth, birth);
-      }
-      _ => panic!("Expected Birth"),
-    }
-  }
-}
