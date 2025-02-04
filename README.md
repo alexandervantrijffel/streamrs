@@ -8,7 +8,7 @@ Demo that produces and consumes messages using the [Fluvio Streaming Engine](htt
 
 To interact with the Fluvio cluster, install the Fluvio CLI.
 
-Make sure to add $HOME/.fvm/bin and $HOME/.fluvio/bin to your PATH.
+Make sure to add $HOME/.fvm/bin and $HOME/.fluvio/bin to your PATH before running these commands:
 
 ```shell
 curl -fsS https://hub.infinyon.cloud/install/install.sh | bash
