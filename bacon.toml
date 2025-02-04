@@ -1,4 +1,4 @@
-default_job = "run"
+default_job = "run-producer"
 env.CARGO_TERM_COLOR = "always"
 
 [jobs.test]
@@ -19,6 +19,10 @@ command = [
 
 ]
 
+[keybindings]
+p = "job:run-producer"
+c = "job:run-consumer"
+
 # Run your long-running application (eg server) and have the result displayed in bacon.
 # For programs that never stop (eg a server), `background` is set to false
 # to have the cargo run output immediately displayed instead of waiting for
@@ -27,7 +31,7 @@ command = [
 # on every change (an alternative would be to use the 'F5' key manually in bacon).
 # If you often use this job, it makes sense to override the 'r' key by adding
 # a binding `r = job:run-long` at the end of this file .
-[jobs.run]
+[jobs.run-producer]
 command = [
   "cargo",
   "+nightly",
@@ -45,3 +49,30 @@ allow_warnings = true
 background = false
 on_change_strategy = "kill_then_restart"
 ignore = ["**/generated_at_build.rs"]
+
+# Run your long-running application (eg server) and have the result displayed in bacon.
+# For programs that never stop (eg a server), `background` is set to false
+# to have the cargo run output immediately displayed instead of waiting for
+# program's end.
+# 'on_change_strategy' is set to `kill_then_restart` to have your program restart
+# on every change (an alternative would be to use the 'F5' key manually in bacon).
+# If you often use this job, it makes sense to override the 'r' key by adding
+# a binding `r = job:run-long` at the end of this file .
+[jobs.run-consumer]
+command = [
+  "cargo",
+  "+nightly",
+  "run",
+  "-Zcodegen-backend",
+  "--all-features",
+  # put launch parameters for your program behind a `--` separator
+  "-p",
+  "streamit",
+   "--bin",
+  "consumer",
+]
+need_stdout = true
+allow_warnings = true
+background = false
+on_change_strategy = "kill_then_restart"
+

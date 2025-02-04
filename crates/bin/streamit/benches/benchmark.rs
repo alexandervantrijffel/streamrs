@@ -1,6 +1,9 @@
 use criterion::BenchmarkId;
 use criterion::{Criterion, criterion_group, criterion_main};
 
+fn test() {
+  // test_serialize_roundtrip();
+}
 async fn new() {}
 
 // async fn heap(levels: u32) {

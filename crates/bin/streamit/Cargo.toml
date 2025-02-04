@@ -10,10 +10,9 @@ doctest = false
 
 [dependencies]
 anyhow.workspace = true
-async-std = {version="1.13.0", features=["attributes"]}
 bilrost = "0"
 fluvio = "0.24"
-nanoid.workspace = true
+futures = "0.3.31"
 serde.workspace=true
 time.workspace=true
 tokio.workspace = true
@@ -25,11 +24,11 @@ criterion = { version = "0", features= ["async_tokio"] }
 
 [[bin]]
 name = "producer"
-path = "src/producer.rs"
+path = "src/main_producer.rs"
 
 [[bin]]
 name = "consumer"
-path = "src/consumer.rs"
+path = "src/main_consumer.rs"
 
 [[bench]]
 name = "benchmark"
