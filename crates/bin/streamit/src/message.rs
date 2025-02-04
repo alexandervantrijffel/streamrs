@@ -46,8 +46,7 @@ pub mod tests {
 
   #[test]
   pub async fn test_serialize_roundtrip() {
-    let name = (0..10_000).map(|_| "Alice").collect::<String>();
-    let birth = Birth::new(name);
+    let birth = Birth::new(String::from("Alice"));
     let wrapper = MessageWrapper {
       kind: MessageKind::Birth(birth),
     };

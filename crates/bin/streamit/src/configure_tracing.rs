@@ -1,6 +1,6 @@
 use tracing_subscriber::{EnvFilter, fmt, layer::SubscriberExt, util::SubscriberInitExt};
 
-pub fn configure_tracing() {
+pub fn init() {
   let fmt_layer = fmt::layer()
     // log as json
     // .json()

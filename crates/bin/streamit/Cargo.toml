@@ -10,9 +10,9 @@ doctest = false
 
 [dependencies]
 anyhow.workspace = true
-bilrost = "0"
-fluvio = "0.24"
-futures = "0.3.31"
+bilrost.workspace = true
+fluvio.workspace = true
+futures.workspace = true
 serde.workspace=true
 time.workspace=true
 tokio.workspace = true
