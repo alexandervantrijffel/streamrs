@@ -1,8 +1,8 @@
 use anyhow::Context;
 use bilrost::BorrowedMessage;
 use fluvio::{
-  Fluvio, Offset,
   consumer::{ConsumerConfigExtBuilder, Record},
+  Fluvio, Offset,
 };
 use futures::StreamExt;
 use std::{sync::Arc, time::Duration};
@@ -12,7 +12,7 @@ use streamitlib::{
   topic::MYIO_TOPIC,
 };
 use tokio::{
-  signal::unix::{SignalKind, signal},
+  signal::unix::{signal, SignalKind},
   sync::mpsc::{self, Sender},
   time::sleep,
 };

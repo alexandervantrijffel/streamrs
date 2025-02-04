@@ -1,0 +1,39 @@
+name: Validate and build
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - "**"
+
+concurrency:
+  group: main-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  validate-and-build:
+    name: Validate and build
+    if: "!contains(github.event.head_commit.message, 'NO_CI')"
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: fmt validation
+        run: |
+          cargo fmt -- --check
+
+      - name: clippy validation
+        run: |
+          cargo clippy -- -Dwarnings --no-deps
+
+      - name: cargo audit
+        run: |
+          cargo audit
+
+      - name: build
+        run: | 
+          cargo build --release
+      
+      - name: test
+        run: | 
+          cargo test --release

@@ -23,8 +23,8 @@ split-debuginfo = "unpacked" # improve compilation performance by using unpacked
 lto = false # Disable link-time optimization to reduce build time
 codegen-units = 64 # Reduce number of codegen units to increase optimizations
 panic = 'abort'
-strip = true # Strip symbols from binary*
-opt-level = 3 # All optimizations
+# strip = true # Strip symbols from binary*
+# opt-level = 3 # All optimizations
 incremental = true # shorten hot local builds duration
 
 [workspace.metadata]

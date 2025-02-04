@@ -1,7 +1,7 @@
 [package]
 name = "streamit"
 version = "0.1.0"
-edition = "2024"
+edition = "2021"
 
 [lib]
 name = "streamitlib"
@@ -29,7 +29,3 @@ path = "src/main_producer.rs"
 [[bin]]
 name = "consumer"
 path = "src/main_consumer.rs"
-
-[[bench]]
-name = "benchmark"
-harness = false
