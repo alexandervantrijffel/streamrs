@@ -10,16 +10,16 @@ use tracing::{debug, error, info};
 
 #[tokio::main]
 async fn main() {
-  init();
+  _ = init();
   info!("Starting Producer");
   _ = producer().await.inspect_err(|e| {
     error!("Unexpected error: {:?}", e);
   });
 }
 
-pub async fn producer() -> anyhow::Result<()> {
+async fn producer() -> anyhow::Result<()> {
   let birth = Birth::new("Alice".to_owned());
-  let msg = format!("Message sent to Fluvio: {:?}", birth);
+  let msg = format!("Message sent to Fluvio: {birth:?}");
 
   let wrapper = MessageWrapper {
     kind: MessageKind::Birth(birth),

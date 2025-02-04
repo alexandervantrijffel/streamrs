@@ -20,14 +20,14 @@ use tracing::{debug, error, info, trace, warn};
 
 #[tokio::main]
 async fn main() {
-  init();
+  _ = init();
   info!("Starting Consumer");
   _ = consumer().await.inspect_err(|e| {
     error!("Unexpected error: {:?}", e);
   });
 }
 
-pub async fn consumer() -> anyhow::Result<()> {
+async fn consumer() -> anyhow::Result<()> {
   let (tx, mut rx) = mpsc::channel(100);
 
   let mut receiver_task = tokio::spawn(async move {
@@ -44,11 +44,11 @@ pub async fn consumer() -> anyhow::Result<()> {
     loop {
       tokio::select! {
           Some(data) = rx.recv() => {
-              _ = handle_message(data).await.inspect_err(|e| {
+              _ = handle_message(&data).inspect_err(|e| {
                 debug!("Failed to handle message: {:?}", e);
               });
           }
-          _ = sleep(Duration::from_secs(10)) => trace!("No new messages after 10s"),
+          () = sleep(Duration::from_secs(10)) => trace!("No new messages after 10s"),
           _ = handle_signals() => {
               break;
           }
@@ -87,7 +87,7 @@ async fn receiver(tx: Arc<Sender<Record>>) -> anyhow::Result<()> {
   }
 }
 
-async fn handle_message(record: Record) -> anyhow::Result<()> {
+fn handle_message(record: &Record) -> anyhow::Result<()> {
   let data = record.value();
   let wrapper = MessageWrapper::decode_borrowed(data).context("Failed to decode message")?;
 
@@ -106,12 +106,13 @@ async fn handle_message(record: Record) -> anyhow::Result<()> {
 }
 
 async fn handle_signals() -> anyhow::Result<()> {
-  let mut signal_terminate = signal(SignalKind::terminate()).unwrap();
-  let mut signal_interrupt = signal(SignalKind::interrupt()).unwrap();
+  let mut signal_terminate = signal(SignalKind::terminate())?;
+  let mut signal_interrupt = signal(SignalKind::interrupt())?;
 
   tokio::select! {
       _ = signal_terminate.recv() => debug!("Received SIGTERM."),
       _ = signal_interrupt.recv() => debug!("Received SIGINT."),
   };
+
   Ok(())
 }

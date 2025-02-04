@@ -29,6 +29,7 @@ pub struct Birth {
 }
 
 impl Birth {
+  #[must_use]
   pub fn new(name: String) -> Self {
     Self {
       born_at_epoch: OffsetDateTime::now_utc().unix_timestamp(),

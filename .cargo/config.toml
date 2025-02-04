@@ -1,5 +1,5 @@
 [target.aarch64-unknown-linux-gnu]
-rustflags = ["-C", "target-cpu=native", "-W", "clippy::all", "-W", "clippy::pedantic", "-W", "clippy::nursery", "-W", "clippy::cargo"]
+rustflags = ["-C", "target-cpu=native", "-W", "clippy::all", "-W", "clippy::pedantic", "-W", "clippy::nursery", "-W", "clippy::cargo", "-A", "clippy::cargo_common_metadata", "-A", "clippy::redundant_pub_crate"]
 
 [target.x86_64-unknown-linux-gnu]
-rustflags = ["-C", "target-cpu=native", "-W", "clippy::all", "-W", "clippy::pedantic", "-W", "clippy::nursery", "-W", "clippy::cargo"]
+rustflags = ["-C", "target-cpu=native", "-W", "clippy::all", "-W", "clippy::pedantic", "-W", "clippy::nursery", "-W", "clippy::cargo", "-A", "clippy::cargo_common_metadata", "-A", "clippy::redundant_pub_crate"]
