@@ -8,6 +8,8 @@ use fluvio::RecordKey;
 use message::{Birth, MessageKind, MessageWrapper};
 use tracing::debug;
 
+pub const MYIO_TOPIC: &str = "myio";
+
 pub async fn producer() -> anyhow::Result<()> {
   let birth = Birth::new("Alice".to_owned());
   let msg = format!("Message sent to Fluvio: {:?}", birth);
@@ -16,7 +18,9 @@ pub async fn producer() -> anyhow::Result<()> {
     kind: MessageKind::Birth(birth),
   };
 
-  let producer = fluvio::producer("myio").await.context("Failed to create producer")?;
+  let producer = fluvio::producer(MYIO_TOPIC)
+    .await
+    .context("Failed to create producer")?;
 
   producer
     .send(RecordKey::NULL, wrapper.encode_to_bytes())

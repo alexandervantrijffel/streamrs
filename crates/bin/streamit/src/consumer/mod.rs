@@ -1,4 +1,7 @@
-use crate::message::{MessageKind, MessageWrapper};
+use crate::{
+  MYIO_TOPIC,
+  message::{MessageKind, MessageWrapper},
+};
 use anyhow::Context;
 use bilrost::BorrowedMessage;
 use fluvio::{
@@ -55,7 +58,7 @@ async fn receiver(tx: Arc<Sender<Record>>) -> anyhow::Result<()> {
     let mut stream = fluvio
       .consumer_with_config(
         ConsumerConfigExtBuilder::default()
-          .topic("myio")
+          .topic(MYIO_TOPIC)
           .partition(0)
           // TODO store last processed offset in a topic
           .offset_start(Offset::beginning())
