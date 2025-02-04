@@ -20,6 +20,7 @@ command = [
   # "--success-output",
   # "immediate",
   # "--",
+
 ]
 
 # Run your long-running application (eg server) and have the result displayed in bacon.
@@ -38,9 +39,10 @@ command = [
   "-Zcodegen-backend",
   "--all-features",
   # put launch parameters for your program behind a `--` separator
-  "--",
   "-p",
-  "streamit"
+  "streamit",
+   "--bin",
+  "producer",
 ]
 need_stdout = true
 allow_warnings = true

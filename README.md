@@ -1,6 +1,6 @@
 # Streaming demo
 
-To interact with the Fluvio cluster, install the Fluvio CLI. 
+To interact with the Fluvio cluster, install the Fluvio CLI.
 
 Make sure to add $HOME/.fvm/bin and $HOME/.fluvio/bin to your PATH.
 
