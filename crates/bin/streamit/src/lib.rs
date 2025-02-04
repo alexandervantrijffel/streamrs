@@ -1,10 +1,13 @@
 mod birth;
+mod configure_tracing;
 
+use crate::configure_tracing::configure_tracing;
 use anyhow::Context;
 use bilrost::Message;
+use bilrost::Oneof;
+use birth::Birth;
 use fluvio::RecordKey;
 use tracing::{debug, info};
-use tracing_subscriber::{EnvFilter, fmt, layer::SubscriberExt, util::SubscriberInitExt};
 
 pub fn consumer() {
   configure_tracing();
@@ -16,38 +19,65 @@ pub async fn producer() {
   info!("Started Producer");
 
   let birth = birth::Birth::new_now("Alice".to_owned());
-  let encoded = birth.encode_to_bytes();
+  let msg = format!("Message sent to Fluvio: {:?}", birth);
+
+  // bilrost scored well in this Rust serialization benchmark
+  // https://github.com/djkoloski/rust_serialization_benchmark
+  // let encoded = birth.encode_to_bytes();
+
+  let wrapper = MessageWrapper {
+    kind: MessageKind::Birth(birth),
+  };
 
   let producer = fluvio::producer("myio").await.expect("Failed to create producer");
 
   producer
-    .send(RecordKey::NULL, encoded)
+    .send(RecordKey::NULL, wrapper.encode_to_bytes())
     // .send(nanoid::nanoid!(8), encoded)
     .await
     .expect("Failed to send message");
 
   producer.flush().await.context("Failed to flush producer").unwrap();
-
-  debug!("Message sent to Fluvio: {:?}", birth);
+  debug!(msg);
 }
 
-fn configure_tracing() {
-  let fmt_layer = fmt::layer()
-    // log as json
-    // .json()
-    // .with_current_span(true)
-    // .with_line_number(false)
-    // disable printing the name of the module in every log line.
-    // .with_target(false)
-    .without_time();
+#[derive(Clone, Message, PartialEq)]
+pub struct MessageWrapper {
+  #[bilrost(oneof(100, 101))]
+  pub kind: MessageKind,
+}
 
-  let filter_layer = EnvFilter::try_from_default_env()
-    .or_else(|_| {
-      EnvFilter::try_new(
-        "trace,async_io=debug,fluvio_protocol=debug,fluvio_socket=debug,fluvio=info,fluvio_socket=info,polling=debug,async_std=debug",
-      )
-    })
-    .unwrap();
+#[derive(Clone, Oneof, PartialEq)]
+pub enum MessageKind {
+  None,
+  #[bilrost(100)]
+  Birth(Birth),
+  #[bilrost(101)]
+  Marriage(String),
+}
 
-  tracing_subscriber::registry().with(fmt_layer).with(filter_layer).init();
+#[cfg(test)]
+pub mod tests {
+  use super::*;
+  use bilrost::{BorrowedMessage, Message};
+  use birth::Birth;
+  use tokio::test;
+
+  #[test]
+  pub async fn test_serialize_roundtrip() {
+    let name = (0..10_000).map(|_| "Alice").collect::<String>();
+    let birth = Birth::new_now(name);
+    let wrapper = MessageWrapper {
+      kind: MessageKind::Birth(birth),
+    };
+
+    let encoded = wrapper.encode_to_bytes();
+    let decoded = MessageWrapper::decode_borrowed(&encoded).unwrap();
+    match decoded.kind {
+      MessageKind::Birth(birth) => {
+        assert_eq!(birth, birth);
+      }
+      _ => panic!("Expected Birth"),
+    }
+  }
 }

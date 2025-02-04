@@ -1,7 +1,7 @@
 use bilrost::Message;
 use time::OffsetDateTime;
 
-#[derive(Debug, PartialEq, Message)]
+#[derive(Debug, Eq, PartialEq, Clone, Message)]
 pub struct Birth {
   name: String,
   born_at_epoch: i64,

@@ -16,8 +16,12 @@ fluvio = "0.24"
 nanoid.workspace = true
 serde.workspace=true
 time.workspace=true
+tokio.workspace = true
 tracing.workspace = true
 tracing-subscriber.workspace = true
+
+[dev-dependencies]
+criterion = { version = "0", features= ["async_tokio"] }
 
 [[bin]]
 name = "producer"
@@ -26,3 +30,7 @@ path = "src/producer.rs"
 [[bin]]
 name = "consumer"
 path = "src/consumer.rs"
+
+[[bench]]
+name = "benchmark"
+harness = false

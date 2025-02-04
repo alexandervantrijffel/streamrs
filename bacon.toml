@@ -13,8 +13,8 @@ command = [
   "--hide-progress-bar",
   "--failure-output",
   "final", # or immediate
-  # "--success-output",
-  # "immediate",
+  "--success-output",
+  "immediate",
   # "--",
 
 ]

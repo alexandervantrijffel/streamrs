@@ -9,6 +9,7 @@ fn-error-context = "0"
 nanoid = "0"
 serde = { version = "1", default-features = false, features = ["derive"] }
 time = { version = "0", features = ["serde", "parsing", "formatting", "macros"] }
+tokio = { version = "1", default-features = false, features = ["tracing", "macros", "rt-multi-thread"] }
 tracing = "0"
 tracing-subscriber = {version = "0.3", features = ["env-filter"]}
 
@@ -26,3 +27,4 @@ incremental = true # shorten hot local builds duration
 
 [workspace.metadata]
 deny-unsafe-code = true
+
