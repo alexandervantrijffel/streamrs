@@ -1,4 +1,10 @@
-# Streaming demo
+# Fluvio Streaming demo
+
+## Introduction
+
+Demo that produces and consumes messages using the [Fluvio Streaming Engine](https://www.fluvio.io). The message data is serialized and compressed with [bilrost](https://github.com/mumbleskates/bilrost) as it performs really well according to this [benchmark](https://github.com/djkoloski/rust_serialization_benchmark).
+
+## Getting Started
 
 To interact with the Fluvio cluster, install the Fluvio CLI.
 
