@@ -16,7 +16,7 @@ use tokio::{
   sync::mpsc::{self, Sender},
   time::sleep,
 };
-use tracing::{debug, error, info, warn};
+use tracing::{debug, error, info, trace, warn};
 
 #[tokio::main]
 async fn main() {
@@ -48,6 +48,7 @@ pub async fn consumer() -> anyhow::Result<()> {
                 debug!("Failed to handle message: {:?}", e);
               });
           }
+          _ = sleep(Duration::from_secs(10)) => trace!("No new messages after 10s"),
           _ = handle_signals() => {
               break;
           }
