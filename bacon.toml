@@ -15,8 +15,6 @@ command = [
   "final", # or immediate
   "--success-output",
   "immediate",
-  # "--",
-
 ]
 
 [keybindings]
@@ -29,8 +27,7 @@ c = "job:run-consumer"
 # program's end.
 # 'on_change_strategy' is set to `kill_then_restart` to have your program restart
 # on every change (an alternative would be to use the 'F5' key manually in bacon).
-# If you often use this job, it makes sense to override the 'r' key by adding
-# a binding `r = job:run-long` at the end of this file .
+# the job uses the cranelift compiler form nightly to reduce compilation time with ~33%.
 [jobs.run-producer]
 command = [
   "cargo",
@@ -56,8 +53,7 @@ ignore = ["**/generated_at_build.rs"]
 # program's end.
 # 'on_change_strategy' is set to `kill_then_restart` to have your program restart
 # on every change (an alternative would be to use the 'F5' key manually in bacon).
-# If you often use this job, it makes sense to override the 'r' key by adding
-# a binding `r = job:run-long` at the end of this file .
+# the job uses the cranelift compiler form nightly to reduce compilation time with ~33%.
 [jobs.run-consumer]
 command = [
   "cargo",

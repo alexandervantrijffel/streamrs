@@ -23,3 +23,5 @@ fluvio profile add docker 127.0.0.1:9103 docker
 fluvio topic create myio --retention-time '7 days' --segment-size '5 Ki' --max-partition-size '30 Ki'
 fluvio topic list
 ```
+
+Run the solution locally with [bacon](https://github.com/Canop/bacon) by executing `bacon`. Enter 'p' in Bacon to run the producer and enter 'c' to run the consumer.
