@@ -7,11 +7,9 @@ use anyhow::Context;
 use bilrost::Message;
 use fluvio::RecordKey;
 use message::{Birth, MessageKind, MessageWrapper};
-use tracing::{debug, info};
+use tracing::debug;
 
 pub async fn producer() -> anyhow::Result<()> {
-  info!("Started Producer");
-
   let birth = Birth::new("Alice".to_owned());
   let msg = format!("Message sent to Fluvio: {:?}", birth);
 

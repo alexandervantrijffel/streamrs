@@ -11,14 +11,12 @@ use tokio::{
   signal::unix::{SignalKind, signal},
   sync::mpsc::{self, Sender},
 };
-use tracing::{debug, error, info, warn};
+use tracing::{debug, error, warn};
 
 pub async fn consumer() -> anyhow::Result<()> {
-  info!("Started Consumer");
-
   let (tx, mut rx) = mpsc::channel(100);
 
-  let mut connector_task = tokio::spawn(async move {
+  let mut receiver_task = tokio::spawn(async move {
     let tx = Arc::new(tx);
     loop {
       _ = receiver(tx.clone())
@@ -44,7 +42,7 @@ pub async fn consumer() -> anyhow::Result<()> {
 
   // If any one of the tasks run to completion, we abort the other.
   tokio::select! {
-      _ = (&mut connector_task) => connector_task.abort(),
+      _ = (&mut receiver_task) => receiver_task.abort(),
       _ = (&mut recv_task) => recv_task.abort(),
   };
 
@@ -59,7 +57,7 @@ async fn receiver(tx: Arc<Sender<Record>>) -> anyhow::Result<()> {
         ConsumerConfigExtBuilder::default()
           .topic("myio")
           .partition(0)
-          // TODO store offset in a topic
+          // TODO store last processed offset in a topic
           .offset_start(Offset::beginning())
           .build()?,
       )
