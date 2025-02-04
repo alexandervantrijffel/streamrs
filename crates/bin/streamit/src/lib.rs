@@ -3,5 +3,5 @@ pub fn consumer() {
 }
 
 pub fn producer() {
-  println!("Consumer");
+  println!("Producer");
 }

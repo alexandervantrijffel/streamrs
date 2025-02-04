@@ -1,11 +1,7 @@
 default_job = "check"
 env.CARGO_TERM_COLOR = "always"
 
-[aliases]
-test = "bacon test-all-cranelift"
-run = "bacon streamit-cranelift"
-
-[jobs.test-all-cranelift]
+[jobs.test]
 command = [
   "cargo",
   "+nightly",
@@ -31,7 +27,7 @@ command = [
 # on every change (an alternative would be to use the 'F5' key manually in bacon).
 # If you often use this job, it makes sense to override the 'r' key by adding
 # a binding `r = job:run-long` at the end of this file .
-[jobs.streamit-cranelift]
+[jobs.run]
 command = [
   "cargo",
   "+nightly",

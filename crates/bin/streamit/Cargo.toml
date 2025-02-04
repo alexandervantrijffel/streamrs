@@ -9,6 +9,7 @@ path = "src/lib.rs"
 doctest = false
 
 [dependencies]
+tokio = {workspace=true}
 
 [[bin]]
 name = "producer"
