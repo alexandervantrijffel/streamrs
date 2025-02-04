@@ -1,4 +1,4 @@
 #[tokio::main]
 async fn main() {
-  streamitlib::producer();
+  streamitlib::producer().await;
 }

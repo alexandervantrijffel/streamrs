@@ -1,4 +1,4 @@
-default_job = "check"
+default_job = "run"
 env.CARGO_TERM_COLOR = "always"
 
 [jobs.test]

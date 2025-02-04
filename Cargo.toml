@@ -3,13 +3,15 @@ resolver = "2"
 members = ["crates/bin/streamit"]
 
 [workspace.dependencies]
-anyhow = { version = "1", features = ["backtrace"] }
+anyhow = { version = "1" }
+chrono = "0"
 fn-error-context = "0"
 nanoid = "0"
 serde = { version = "1", default-features = false, features = ["derive"] }
+time = { version = "0", features = ["serde", "parsing", "formatting", "macros"] }
 tokio = { version = "1", default-features = false, features = [ "full"] }
 tracing = "0"
-tracing-subscriber = { version = "0", features = ["env-filter", "fmt"] }
+tracing-subscriber = {version = "0.3", features = ["env-filter"]}
 
 [profile.dev]
 opt-level = 0 # Disable optimizations and reduce the compile time

@@ -9,7 +9,15 @@ path = "src/lib.rs"
 doctest = false
 
 [dependencies]
-tokio = {workspace=true}
+anyhow.workspace = true
+bilrost = "0"
+fluvio = "0.24"
+nanoid.workspace = true
+serde.workspace=true
+time.workspace=true
+tokio.workspace=true
+tracing.workspace = true
+tracing-subscriber.workspace = true
 
 [[bin]]
 name = "producer"
