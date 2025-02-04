@@ -10,12 +10,12 @@ doctest = false
 
 [dependencies]
 anyhow.workspace = true
+async-std = {version="1.13.0", features=["attributes"]}
 bilrost = "0"
 fluvio = "0.24"
 nanoid.workspace = true
 serde.workspace=true
 time.workspace=true
-tokio.workspace=true
 tracing.workspace = true
 tracing-subscriber.workspace = true
 

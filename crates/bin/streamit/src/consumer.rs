@@ -1,4 +1,4 @@
-#[tokio::main(flavor = "multi_thread", worker_threads = 4)]
+#[async_std::main]
 async fn main() {
   streamitlib::consumer();
 }

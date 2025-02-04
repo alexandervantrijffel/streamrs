@@ -9,7 +9,6 @@ fn-error-context = "0"
 nanoid = "0"
 serde = { version = "1", default-features = false, features = ["derive"] }
 time = { version = "0", features = ["serde", "parsing", "formatting", "macros"] }
-tokio = { version = "1", default-features = false, features = [ "full"] }
 tracing = "0"
 tracing-subscriber = {version = "0.3", features = ["env-filter"]}
 
