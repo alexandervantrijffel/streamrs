@@ -5,7 +5,7 @@ use fluvio::{
   Fluvio, Offset,
 };
 use futures::StreamExt;
-use std::{sync::Arc, time::Duration};
+use std::time::Duration;
 use streamitlib::{
   configure_tracing::init,
   message::{MessageKind, MessageWrapper},
@@ -30,10 +30,9 @@ async fn main() {
 async fn consumer() -> anyhow::Result<()> {
   let (tx, mut rx) = mpsc::channel(100);
 
-  let mut receiver_task = tokio::spawn(async move {
-    let tx = Arc::new(tx);
+  let mut ingest_task = tokio::spawn(async move {
     loop {
-      if let Err(e) = receiver(tx.clone()).await {
+      if let Err(e) = receiver(&tx).await {
         warn!("receiver error: {e:?}");
         sleep(Duration::from_secs(2)).await;
       }
@@ -58,33 +57,32 @@ async fn consumer() -> anyhow::Result<()> {
 
   // If any one of the tasks run to completion, we abort the other.
   tokio::select! {
-      _ = (&mut receiver_task) => receiver_task.abort(),
+      _ = (&mut ingest_task) => ingest_task.abort(),
       _ = (&mut recv_task) => recv_task.abort(),
   };
 
   Ok(())
 }
 
-async fn receiver(tx: Arc<Sender<Record>>) -> anyhow::Result<()> {
-  loop {
-    let fluvio = Fluvio::connect().await?;
-    let mut stream = fluvio
-      .consumer_with_config(
-        ConsumerConfigExtBuilder::default()
-          .topic(MYIO_TOPIC)
-          .partition(0)
-          // TODO store last processed offset in a topic
-          .offset_start(Offset::beginning())
-          .build()?,
-      )
-      .await?;
-    while let Some(msg) = stream.next().await {
-      match msg {
-        Ok(msg) => tx.send(msg).await.context("Failed to send to the mpsc channel")?,
-        Err(e) => error!("{e:?}"),
-      }
+async fn receiver(tx: &Sender<Record>) -> anyhow::Result<()> {
+  let fluvio = Fluvio::connect().await?;
+  let mut stream = fluvio
+    .consumer_with_config(
+      ConsumerConfigExtBuilder::default()
+        .topic(MYIO_TOPIC)
+        .partition(0)
+        // TODO store last processed offset in a topic
+        .offset_start(Offset::beginning())
+        .build()?,
+    )
+    .await?;
+  while let Some(msg) = stream.next().await {
+    match msg {
+      Ok(msg) => tx.send(msg).await.context("Failed to send to the mpsc channel")?,
+      Err(e) => error!("{e:?}"),
     }
   }
+  Ok(())
 }
 
 fn handle_message(record: &Record) -> anyhow::Result<()> {
