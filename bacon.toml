@@ -12,7 +12,7 @@ command = [
   "--verbose",
   "--hide-progress-bar",
   "--failure-output",
-  "final", # or immediate
+  "immediate", # or immediate
   "--success-output",
   "immediate",
 ]

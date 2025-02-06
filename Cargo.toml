@@ -17,6 +17,7 @@ tracing-subscriber = {version = "0", features = ["env-filter"]}
 [profile.dev]
 opt-level = 0 # Disable optimizations and reduce the compile time
 split-debuginfo = "unpacked" # improve compilation performance by using unpacked debug symbols
+debug=true
 
 [profile.release]
 lto = false # Disable link-time optimization to reduce build time

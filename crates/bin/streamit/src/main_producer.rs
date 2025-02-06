@@ -3,7 +3,7 @@ use bilrost::Message;
 use fluvio::RecordKey;
 use streamitlib::{
   configure_tracing::init,
-  message::{Birth, MessageKind, MessageWrapper},
+  message::{Birth, MessageWrapper},
   topic::MYIO_TOPIC,
 };
 use tracing::{debug, error, info};
@@ -20,10 +20,7 @@ async fn main() {
 async fn producer() -> anyhow::Result<()> {
   let birth = Birth::new("Alice".to_owned());
   let msg = format!("Message sent to Fluvio: {birth:?}");
-
-  let wrapper = MessageWrapper {
-    kind: MessageKind::Birth(birth),
-  };
+  let wrapper = MessageWrapper::from(birth);
 
   let producer = fluvio::producer(MYIO_TOPIC)
     .await

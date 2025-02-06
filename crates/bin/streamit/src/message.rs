@@ -12,6 +12,14 @@ pub struct MessageWrapper {
   pub kind: MessageKind,
 }
 
+impl From<Birth> for MessageWrapper {
+  fn from(birth: Birth) -> Self {
+    Self {
+      kind: MessageKind::Birth(birth),
+    }
+  }
+}
+
 #[derive(Debug, Eq, Clone, Oneof, PartialEq)]
 // #[bilrost(distinguished)]
 pub enum MessageKind {
