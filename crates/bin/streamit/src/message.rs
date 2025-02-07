@@ -8,8 +8,25 @@ use time::OffsetDateTime;
 #[derive(Debug, Clone, Eq, Message, PartialEq)]
 // #[bilrost(distinguished)]
 pub struct MessageWrapper {
-  #[bilrost(oneof(100, 101))]
+  #[bilrost(oneof(100, 101, 102))]
   pub kind: MessageKind,
+}
+
+impl MessageWrapper {
+  #[must_use]
+  pub fn new_close_server() -> Self {
+    Self {
+      kind: MessageKind::CloseConsumers(String::from("Server is closing")),
+    }
+  }
+}
+
+impl From<Birth> for MessageWrapper {
+  fn from(birth: Birth) -> Self {
+    Self {
+      kind: MessageKind::Birth(birth),
+    }
+  }
 }
 
 #[derive(Debug, Eq, Clone, Oneof, PartialEq)]
@@ -20,6 +37,8 @@ pub enum MessageKind {
   Birth(Birth),
   #[bilrost(101)]
   Marriage(String),
+  #[bilrost(102)]
+  CloseConsumers(String),
 }
 
 #[derive(Debug, Eq, PartialEq, Clone, Message)]

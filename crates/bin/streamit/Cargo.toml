@@ -11,14 +11,18 @@ doctest = false
 
 [dependencies]
 anyhow.workspace = true
+async-trait.workspace = true
 bilrost.workspace = true
 fluvio.workspace = true
+fluvio-protocol.workspace = true
 futures.workspace = true
 serde.workspace=true
+thiserror.workspace=true
 time.workspace=true
 tokio.workspace = true
 tracing.workspace = true
 tracing-subscriber.workspace = true
+tracing-test = "0.2.5"
 
 [[bin]]
 name = "producer"

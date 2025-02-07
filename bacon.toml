@@ -2,19 +2,19 @@ default_job = "run-producer"
 env.CARGO_TERM_COLOR = "always"
 
 [jobs.test]
+clear = false # Keep output on screen
+display = "always" # Ensure output is displayed
 command = [
   "cargo",
   "+nightly",
   "nextest",
   "run",
-  "-Zcodegen-backend",
   "--all-features",
   "--verbose",
-  "--hide-progress-bar",
   "--failure-output",
-  "final", # or immediate
+  "final", # or final
   "--success-output",
-  "immediate",
+  "final",
 ]
 
 [keybindings]
