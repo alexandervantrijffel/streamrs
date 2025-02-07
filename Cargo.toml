@@ -4,11 +4,14 @@ members = ["crates/bin/streamit"]
 
 [workspace.dependencies]
 anyhow = { version = "1" }
+async-trait = "0"
 bilrost = "0"
 chrono = "0"
 fluvio = "0"
+fluvio-protocol = "0"
 futures = "0"
 serde = { version = "1", default-features = false, features = ["derive"] }
+thiserror = "2"
 time = { version = "0", features = ["serde", "parsing", "formatting", "macros"] }
 tokio = { version = "1",  default-features = false, features = ["full", "tracing", "macros", "time"] }
 tracing = "0"

@@ -11,12 +11,13 @@ doctest = false
 
 [dependencies]
 anyhow.workspace = true
-async-trait = "0.1.86"
+async-trait.workspace = true
 bilrost.workspace = true
 fluvio.workspace = true
-fluvio-protocol = "0.12.0"
+fluvio-protocol.workspace = true
 futures.workspace = true
 serde.workspace=true
+thiserror.workspace=true
 time.workspace=true
 tokio.workspace = true
 tracing.workspace = true

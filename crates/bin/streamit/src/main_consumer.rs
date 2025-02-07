@@ -10,6 +10,7 @@ use streamitlib::{
   message::{MessageKind, MessageWrapper},
   topic::MYIO_TOPIC,
 };
+use thiserror::Error;
 use tokio::{
   signal::unix::{signal, SignalKind},
   sync::mpsc::{self, Sender},
@@ -34,25 +35,32 @@ async fn main_consumer(pinger: Arc<dyn Pinger>, consumer: Arc<dyn Consumer>) -> 
   info!("Starting consumer");
   let (tx, mut rx) = mpsc::channel(100);
 
-  let pinger = pinger.clone();
-  let consumer = consumer.clone();
-
   let mut ingest_task = tokio::spawn(async move {
-    // loop {
-    if let Err(e) = receiver(&tx, &*pinger, consumer).await {
-      warn!("receiver error: {e:?}");
+    loop {
+      let pinger = pinger.clone();
+      let consumer = consumer.clone();
+      if let Err(e) = receiver(&tx, &*pinger, consumer).await {
+        warn!("receiver error: {e:?}");
+      }
       sleep(Duration::from_secs(2)).await;
     }
-    // }
   });
 
   let mut recv_task = tokio::spawn(async move {
     loop {
       tokio::select! {
           Some(data) = rx.recv() => {
-              _ = handle_message(&data).inspect_err(|e| {
-                debug!("Failed to handle message: {:?}", e);
-              });
+              if let Err(e) = handle_message(&data) {
+                  match e.downcast_ref::<ConsumerError>() {
+                      Some(ConsumerError::CloseRequested(reason)) => {
+                          info!("Close consumers requested: {reason}");
+                          break;
+                      }
+                      None => {
+                          error!("Failed to handle message: {e}");
+                      }
+                  }
+              };
           }
 
           () = sleep(Duration::from_secs(10)) => trace!("No new messages after 10s"),
@@ -119,11 +127,21 @@ fn handle_message(record: &ConsumerRecord) -> anyhow::Result<()> {
     MessageKind::Marriage(marriage) => {
       debug!("Received Marriage: {:?}", marriage);
     }
+    MessageKind::CloseConsumers(reason) => {
+      debug!("Received CloseServer: {:?}", reason);
+      return Err(ConsumerError::CloseRequested(reason).into());
+    }
     MessageKind::None => {
       error!("Received None. Data: {:?}", data);
     }
   };
   Ok(())
+}
+
+#[derive(Error, Debug)]
+pub enum ConsumerError {
+  #[error("CloseServer request received with reason: {0}")]
+  CloseRequested(String),
 }
 
 async fn handle_signals() -> anyhow::Result<()> {
@@ -168,14 +186,20 @@ mod tests {
     let called = Arc::new(AtomicBool::new(false));
     let pinger = Arc::new(MockPinger { called: called.clone() });
 
-    let consumer_mock = Arc::new(MockConsumer::new(vec![MessageWrapper::from(Birth::new(
-      "AliceMOCK".to_owned(),
-    ))
-    .encode_to_bytes()]));
+    let records = [
+      MessageWrapper::from(Birth::new("AliceMOCK".to_owned())),
+      MessageWrapper::new_close_server(),
+    ]
+    .iter()
+    .map(|m| m.encode_to_bytes())
+    .collect();
+    let consumer_mock = Arc::new(MockConsumer::new(records));
 
     let _ = main_consumer(pinger, consumer_mock).await;
 
     assert!(logs_contain("Received Birth"));
+
+    assert!(logs_contain("Received CloseServer"));
 
     assert!(
       called.load(Ordering::SeqCst),
