@@ -10,7 +10,7 @@ pub mod tests {
   use std::pin::Pin;
   use std::task::ready;
 
-  // Mock Consumer that emits a single message
+  // Mock Consumer that emits all records in record_values without a delay
   #[derive(Clone)]
   pub struct MockConsumer {
     record_values: Vec<Record>,

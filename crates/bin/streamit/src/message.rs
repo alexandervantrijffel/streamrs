@@ -6,7 +6,6 @@ use time::OffsetDateTime;
 // https://github.com/djkoloski/rust_serialization_benchmark
 
 #[derive(Debug, Clone, Eq, Message, PartialEq)]
-// #[bilrost(distinguished)]
 pub struct MessageWrapper {
   #[bilrost(oneof(100, 101, 102))]
   pub kind: MessageKind,
@@ -30,7 +29,6 @@ impl From<Birth> for MessageWrapper {
 }
 
 #[derive(Debug, Eq, Clone, Oneof, PartialEq)]
-// #[bilrost(distinguished)]
 pub enum MessageKind {
   None,
   #[bilrost(100)]
