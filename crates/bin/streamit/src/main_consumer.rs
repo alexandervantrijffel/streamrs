@@ -167,14 +167,14 @@ mod tests {
 
   // Mock Pinger that tracks calls
   struct MockPinger {
-    called: Arc<AtomicBool>,
+    called_with_ping: Arc<AtomicBool>,
   }
 
   #[async_trait]
   impl Pinger for MockPinger {
     async fn ping(&self, arg: &str) -> String {
       if arg == "ping" {
-        self.called.store(true, Ordering::SeqCst);
+        self.called_with_ping.store(true, Ordering::SeqCst);
       }
       "pong".to_string()
     }
@@ -184,7 +184,9 @@ mod tests {
   #[tokio::test]
   async fn test_consumer_calls_ping() {
     let called = Arc::new(AtomicBool::new(false));
-    let pinger = Arc::new(MockPinger { called: called.clone() });
+    let pinger = Arc::new(MockPinger {
+      called_with_ping: called.clone(),
+    });
 
     let records = [
       MessageWrapper::from(Birth::new("AliceMOCK".to_owned())),
@@ -198,6 +200,8 @@ mod tests {
     let _ = main_consumer(pinger, consumer_mock).await;
 
     assert!(logs_contain("Received Birth"));
+
+    assert!(logs_contain("AliceMOCK"));
 
     assert!(logs_contain("Received CloseServer"));
 
