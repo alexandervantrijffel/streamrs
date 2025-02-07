@@ -24,4 +24,4 @@ fluvio topic create myio --retention-time '7 days' --segment-size '5 Ki' --max-p
 fluvio topic list
 ```
 
-Run the solution locally with [bacon](https://github.com/Canop/bacon) by executing `bacon`. Enter 'p' in Bacon to run the producer and enter 'c' to run the consumer.
+Run the solution locally with [bacon](https://github.com/Canop/bacon) by executing `bacon`. Enter 'p' in Bacon to run the producer and enter 'c' to run the consumer. Enter 't' in Bacon to run the test suite with [cargo-nextest](https://nexte.st). 

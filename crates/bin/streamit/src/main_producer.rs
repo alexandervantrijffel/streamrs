@@ -12,9 +12,9 @@ use tracing::{debug, error, info};
 async fn main() {
   _ = init();
   info!("Starting Producer");
-  _ = producer().await.inspect_err(|e| {
+  if let Err(e) = producer().await {
     error!("Unexpected error: {:?}", e);
-  });
+  }
 }
 
 async fn producer() -> anyhow::Result<()> {

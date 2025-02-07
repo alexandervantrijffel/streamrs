@@ -1,8 +1,14 @@
+mod consumer;
+mod mock_consumer;
+
 use anyhow::{Context, Result};
 use async_trait::async_trait;
 use bilrost::BorrowedMessage;
 use consumer::{Consumer, FluvioConsumer};
-use fluvio::{consumer::Record as ConsumerRecord, Offset};
+use fluvio::{
+  consumer::{OffsetManagementStrategy, Record as ConsumerRecord},
+  Offset,
+};
 use futures::StreamExt;
 use std::{sync::Arc, time::Duration};
 use streamitlib::{
@@ -13,13 +19,13 @@ use streamitlib::{
 use thiserror::Error;
 use tokio::{
   signal::unix::{signal, SignalKind},
-  sync::mpsc::{self, Sender},
+  sync::{
+    mpsc::{self, Sender},
+    oneshot,
+  },
   time::sleep,
 };
 use tracing::{debug, error, info, trace, warn};
-
-mod consumer;
-mod mock_consumer;
 
 #[tokio::main]
 async fn main() {
@@ -33,13 +39,13 @@ async fn main() {
 
 async fn main_consumer(pinger: Arc<dyn Pinger>, consumer: Arc<dyn Consumer>) -> Result<()> {
   info!("Starting consumer");
-  let (tx, mut rx) = mpsc::channel(100);
+  let (new_msg_tx, mut new_msg_rx) = mpsc::channel(100);
 
   let mut ingest_task = tokio::spawn(async move {
     loop {
       let pinger = pinger.clone();
       let consumer = consumer.clone();
-      if let Err(e) = receiver(&tx, &*pinger, consumer).await {
+      if let Err(e) = receiver(&new_msg_tx, &*pinger, consumer).await {
         warn!("receiver error: {e:?}");
       }
       sleep(Duration::from_secs(2)).await;
@@ -49,8 +55,8 @@ async fn main_consumer(pinger: Arc<dyn Pinger>, consumer: Arc<dyn Consumer>) -> 
   let mut recv_task = tokio::spawn(async move {
     loop {
       tokio::select! {
-          Some(data) = rx.recv() => {
-              if let Err(e) = handle_message(&data) {
+          Some((record,msg_processed_tx)) = new_msg_rx.recv() => {
+              if let Err(e) = handle_message(&record,msg_processed_tx).await {
                   match e.downcast_ref::<ConsumerError>() {
                       Some(ConsumerError::CloseRequested(reason)) => {
                           info!("Close consumers requested: {reason}");
@@ -98,44 +104,81 @@ impl Pinger for RealPinger {
 }
 
 async fn receiver(
-  tx: &Sender<ConsumerRecord>,
+  tx: &Sender<(ConsumerRecord, oneshot::Sender<()>)>,
   pinger: &(impl Pinger + ?Sized),
   consumer: Arc<impl Consumer + ?Sized>,
 ) -> anyhow::Result<()> {
-  // TODO commit offset and set consumer name https://github.com/infinyon/fluvio/blob/master/rfc/offset-management.md
-
-  let mut stream = consumer.clone().consume(MYIO_TOPIC, Offset::beginning()).await.unwrap();
+  let mut stream = consumer
+    .clone()
+    .consume(
+      MYIO_TOPIC,
+      "main_consumer",
+      OffsetManagementStrategy::Manual,
+      // Start from the last committed offset for this consumer or the beginning of the topic
+      // if no offset is committed.
+      // docs: https://github.com/infinyon/fluvio/blob/master/rfc/offset-management.md
+      Offset::beginning(),
+    )
+    .await
+    .unwrap();
 
   while let Some(msg) = stream.next().await {
     match msg {
-      Ok(msg) => tx.send(msg).await.context("Failed to send to the mpsc channel")?,
+      Ok(msg) => {
+        let (msg_processed_tx, msg_processed_rx) = oneshot::channel::<()>();
+        if let Err(e) = tx.send((msg, msg_processed_tx)).await {
+          error!("receiver: Failed to send to the msg_processed channel: {e}");
+          continue;
+        }
+
+        match msg_processed_rx.await {
+          Ok(_) => {
+            trace!("receiver: committing offset");
+            if let Err(e) = stream.offset_commit() {
+              error!("Failed to commit offset: {e}");
+              // todo perf: flushing offsets can be improved by batching
+            } else if let Err(e) = stream.offset_flush().await {
+              error!("Failed to flush offset: {e}");
+            }
+          }
+          Err(e) => error!("receiver: Failed to receive message processed signal: {e}"),
+        }
+      }
       Err(e) => error!("{e:?}"),
     }
   }
+
   pinger.ping("ping").await;
+
   Ok(())
 }
 
-fn handle_message(record: &ConsumerRecord) -> anyhow::Result<()> {
+async fn handle_message(record: &ConsumerRecord, msg_processed_tx: oneshot::Sender<()>) -> anyhow::Result<()> {
   let data = record.value();
   let wrapper = MessageWrapper::decode_borrowed(data).context("Failed to decode message")?;
 
-  match wrapper.kind {
+  let result = match wrapper.kind {
     MessageKind::Birth(birth) => {
       debug!("Received Birth: {:?}", birth);
+      Ok(())
     }
     MessageKind::Marriage(marriage) => {
       debug!("Received Marriage: {:?}", marriage);
+      Ok(())
     }
     MessageKind::CloseConsumers(reason) => {
       debug!("Received CloseServer: {:?}", reason);
-      return Err(ConsumerError::CloseRequested(reason).into());
+      Err(ConsumerError::CloseRequested(reason).into())
     }
     MessageKind::None => {
       error!("Received None. Data: {:?}", data);
+      Ok(())
     }
   };
-  Ok(())
+  if msg_processed_tx.send(()).is_err() {
+    error!("Failed to send message processed signal");
+  };
+  result
 }
 
 #[derive(Error, Debug)]

@@ -2,7 +2,7 @@
 pub mod tests {
   use crate::consumer::Consumer;
   use async_trait::async_trait;
-  use fluvio::consumer::Record as ConsumerRecord;
+  use fluvio::consumer::{OffsetManagementStrategy, Record as ConsumerRecord};
   use fluvio::{consumer::ConsumerStream, Offset};
   use fluvio_protocol::link::ErrorCode;
   use fluvio_protocol::record::{Batch, Record, RecordData};
@@ -32,7 +32,9 @@ pub mod tests {
     async fn consume(
       &self,
       _topic: &str,
-      _offset: Offset,
+      _consumer_name: &str,
+      _offset_strategry: OffsetManagementStrategy,
+      _offset_start: Offset,
     ) -> Result<Pin<Box<dyn ConsumerStream<Item = Result<ConsumerRecord, ErrorCode>> + Send>>, anyhow::Error> {
       let mut batch = Batch::new();
       self
@@ -58,11 +60,11 @@ pub mod tests {
 
   impl<T: Stream<Item = Result<ConsumerRecord, ErrorCode>> + Unpin> ConsumerStream for SinglePartitionConsumerStream<T> {
     fn offset_commit(&mut self) -> std::result::Result<(), ErrorCode> {
-      todo!()
+      Ok(())
     }
 
     fn offset_flush(&mut self) -> futures::future::BoxFuture<'_, std::result::Result<(), ErrorCode>> {
-      todo!()
+      Box::pin(async { Ok(()) })
     }
   }
 
