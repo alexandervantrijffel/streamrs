@@ -56,7 +56,7 @@ async fn main_consumer(pinger: Arc<dyn Pinger>, consumer: Arc<dyn Consumer>) -> 
     loop {
       tokio::select! {
           Some((record,msg_processed_tx)) = new_msg_rx.recv() => {
-              if let Err(e) = handle_message(&record,msg_processed_tx).await {
+              if let Err(e) = handle_message(&record,msg_processed_tx) {
                   match e.downcast_ref::<ConsumerError>() {
                       Some(ConsumerError::CloseRequested(reason)) => {
                           info!("Close consumers requested: {reason}");
@@ -66,7 +66,7 @@ async fn main_consumer(pinger: Arc<dyn Pinger>, consumer: Arc<dyn Consumer>) -> 
                           error!("Failed to handle message: {e}");
                       }
                   }
-              };
+              }
           }
 
           () = sleep(Duration::from_secs(10)) => trace!("No new messages after 10s"),
@@ -132,7 +132,7 @@ async fn receiver(
         }
 
         match msg_processed_rx.await {
-          Ok(_) => {
+          Ok(()) => {
             trace!("receiver: committing offset");
             if let Err(e) = stream.offset_commit() {
               error!("Failed to commit offset: {e}");
@@ -153,7 +153,7 @@ async fn receiver(
   Ok(())
 }
 
-async fn handle_message(record: &ConsumerRecord, msg_processed_tx: oneshot::Sender<()>) -> anyhow::Result<()> {
+fn handle_message(record: &ConsumerRecord, msg_processed_tx: oneshot::Sender<()>) -> anyhow::Result<()> {
   let data = record.value();
   let wrapper = MessageWrapper::decode_borrowed(data).context("Failed to decode message")?;
 
@@ -177,7 +177,7 @@ async fn handle_message(record: &ConsumerRecord, msg_processed_tx: oneshot::Send
   };
   if msg_processed_tx.send(()).is_err() {
     error!("Failed to send message processed signal");
-  };
+  }
   result
 }
 
