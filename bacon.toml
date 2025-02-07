@@ -1,6 +1,10 @@
 default_job = "run-producer"
 env.CARGO_TERM_COLOR = "always"
 
+[keybindings]
+p = "job:run-producer"
+c = "job:run-consumer"
+
 [jobs.test]
 clear = false # Keep output on screen
 display = "always" # Ensure output is displayed
@@ -16,10 +20,6 @@ command = [
   "--success-output",
   "final",
 ]
-
-[keybindings]
-p = "job:run-producer"
-c = "job:run-consumer"
 
 # Run your long-running application (eg server) and have the result displayed in bacon.
 # For programs that never stop (eg a server), `background` is set to false

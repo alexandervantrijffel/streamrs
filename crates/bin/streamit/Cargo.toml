@@ -22,7 +22,9 @@ time.workspace=true
 tokio.workspace = true
 tracing.workspace = true
 tracing-subscriber.workspace = true
-tracing-test = "0.2.5"
+
+[dev-dependencies]
+tracing-test.workspace = true
 
 [[bin]]
 name = "producer"

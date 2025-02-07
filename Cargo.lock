@@ -266,9 +266,9 @@ checksum = "72b3254f16251a8381aa12e40e3c4d2f0199f8c6508fbecb9d91f575e0fbb8c6"
 
 [[package]]
 name = "bilrost"
-version = "0.1012.2"
+version = "0.1012.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "1460cabe910932f31b3f4bef68fc00eab4d204a23d346701278166a92ff5c176"
+checksum = "815ed941f4e34d221bda5ac688ff1f80f579ca0c1b062d381347be6d53786e02"
 dependencies = [
  "bilrost-derive",
  "bytes",
@@ -277,9 +277,9 @@ dependencies = [
 
 [[package]]
 name = "bilrost-derive"
-version = "0.1012.2"
+version = "0.1012.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "1be1860bb23f161f2d1f4f18e28f31587556ad8b9686a9e6a26f368112c42945"
+checksum = "7460f57756524d00acaca4d8c1af4188667739d10b9a2911fd430f6b2857d2d6"
 dependencies = [
  "eyre",
  "itertools",
@@ -631,9 +631,9 @@ dependencies = [
 
 [[package]]
 name = "fluvio"
-version = "0.24.4"
+version = "0.25.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "cbce84db17ac70c190f41652f018a1703a7bc2f303160266bb77947b87c1c271"
+checksum = "d1149b7b6a92d736782241c22c1c5bd1414eab1685c7ed3b3fa13c86a233e999"
 dependencies = [
  "anyhow",
  "async-channel 1.9.0",
@@ -1400,9 +1400,9 @@ dependencies = [
 
 [[package]]
 name = "once_cell"
-version = "1.20.2"
+version = "1.20.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "1261fe7e33c73b354eab43b1273a57c8f967d0391e80353e51f764ac02cf6775"
+checksum = "945462a4b81e43c4e3ba96bd7b49d834c6f61198356aa858733bc4acf3cbe62e"
 
 [[package]]
 name = "openssl"
@@ -2071,9 +2071,9 @@ dependencies = [
 
 [[package]]
 name = "toml"
-version = "0.8.19"
+version = "0.8.20"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "a1ed1f98e3fdc28d6d910e6737ae6ab1a93bf1985935a1193e68f93eeb68d24e"
+checksum = "cd87a5cdd6ffab733b2f74bc4fd7ee5fff6634124999ac278c35fc78c6120148"
 dependencies = [
  "indexmap",
  "serde",

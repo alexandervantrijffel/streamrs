@@ -16,6 +16,7 @@ time = { version = "0", features = ["serde", "parsing", "formatting", "macros"] 
 tokio = { version = "1",  default-features = false, features = ["full", "tracing", "macros", "time"] }
 tracing = "0"
 tracing-subscriber = {version = "0", features = ["env-filter"]}
+tracing-test = "0"
 
 [profile.dev]
 opt-level = 0 # Disable optimizations and reduce the compile time
