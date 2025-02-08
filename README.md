@@ -25,3 +25,5 @@ fluvio topic list
 ```
 
 Run the solution locally with [bacon](https://github.com/Canop/bacon) by executing `bacon`. Enter 'p' in Bacon to run the producer and enter 'c' to run the consumer. Enter 't' in Bacon to run the test suite with [cargo-nextest](https://nexte.st). 
+
+<img width="1480" alt="image" src="https://github.com/user-attachments/assets/b9a3cd93-7b84-4c61-b085-12afdcf2a1cb" />
