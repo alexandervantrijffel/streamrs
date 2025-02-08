@@ -6,8 +6,8 @@ use async_trait::async_trait;
 use bilrost::BorrowedMessage;
 use consumer::{Consumer, FluvioConsumer};
 use fluvio::{
-  consumer::{OffsetManagementStrategy, Record as ConsumerRecord},
   Offset,
+  consumer::{OffsetManagementStrategy, Record as ConsumerRecord},
 };
 use futures::StreamExt;
 use std::{sync::Arc, time::Duration};
@@ -18,7 +18,7 @@ use streamitlib::{
 };
 use thiserror::Error;
 use tokio::{
-  signal::unix::{signal, SignalKind},
+  signal::unix::{SignalKind, signal},
   sync::{
     mpsc::{self, Sender},
     oneshot,

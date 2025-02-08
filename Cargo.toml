@@ -1,6 +1,7 @@
 [workspace]
 resolver = "2"
 members = ["crates/bin/streamit"]
+edition = "2021"
 
 [workspace.dependencies]
 anyhow = { version = "1" }
