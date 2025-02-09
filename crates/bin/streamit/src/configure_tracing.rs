@@ -1,4 +1,4 @@
-use tracing_subscriber::{EnvFilter, fmt, layer::SubscriberExt, util::SubscriberInitExt};
+use tracing_subscriber::{fmt, layer::SubscriberExt, util::SubscriberInitExt, EnvFilter};
 
 pub fn init() -> anyhow::Result<()> {
   let fmt_layer = fmt::layer()

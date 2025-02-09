@@ -6,8 +6,8 @@ use async_trait::async_trait;
 use bilrost::BorrowedMessage;
 use consumer::{Consumer, FluvioConsumer};
 use fluvio::{
-  Offset,
   consumer::{OffsetManagementStrategy, Record as ConsumerRecord},
+  Offset,
 };
 use futures::StreamExt;
 use std::{sync::Arc, time::Duration};
@@ -18,7 +18,7 @@ use streamitlib::{
 };
 use thiserror::Error;
 use tokio::{
-  signal::unix::{SignalKind, signal},
+  signal::unix::{signal, SignalKind},
   sync::{
     mpsc::{self, Sender},
     oneshot,
@@ -37,7 +37,10 @@ async fn main() {
     });
 }
 
-async fn main_consumer(pinger: Arc<dyn Pinger>, consumer: Arc<dyn Consumer>) -> Result<()> {
+async fn main_consumer<TPinger: Pinger + 'static, TConsumer: Consumer + 'static>(
+  pinger: Arc<TPinger>,
+  consumer: Arc<TConsumer>,
+) -> Result<()> {
   info!("Starting consumer");
   let (new_msg_tx, mut new_msg_rx) = mpsc::channel(100);
 
@@ -45,7 +48,7 @@ async fn main_consumer(pinger: Arc<dyn Pinger>, consumer: Arc<dyn Consumer>) -> 
     loop {
       let pinger = pinger.clone();
       let consumer = consumer.clone();
-      if let Err(e) = receiver(&new_msg_tx, &*pinger, consumer).await {
+      if let Err(e) = receiver(&new_msg_tx, pinger, consumer).await {
         warn!("receiver error: {e:?}");
       }
       sleep(Duration::from_secs(2)).await;
@@ -103,10 +106,10 @@ impl Pinger for RealPinger {
   }
 }
 
-async fn receiver(
+async fn receiver<TPinger: Pinger + 'static, TConsumer: Consumer + 'static>(
   tx: &Sender<(ConsumerRecord, oneshot::Sender<()>)>,
-  pinger: &(impl Pinger + ?Sized),
-  consumer: Arc<impl Consumer + ?Sized>,
+  pinger: Arc<TPinger>,
+  consumer: Arc<TConsumer>,
 ) -> anyhow::Result<()> {
   let mut stream = consumer
     .clone()
