@@ -1,6 +1,6 @@
 #[cfg(test)]
 pub mod tests {
-  use crate::consumer::Consumer;
+  use crate::consumer::{Consumer, ConsumerStreamed};
   use anyhow::Result;
   use async_trait::async_trait;
   use fluvio::consumer::{OffsetManagementStrategy, Record as ConsumerRecord};
@@ -8,7 +8,6 @@ pub mod tests {
   use fluvio_protocol::link::ErrorCode;
   use fluvio_protocol::record::{Batch, Record, RecordData};
   use futures::{stream, Stream};
-  use std::pin::Pin;
   use std::task::ready;
 
   // Mock Consumer that emits all records in record_values without a delay
@@ -36,7 +35,7 @@ pub mod tests {
       _consumer_name: &str,
       _offset_strategry: OffsetManagementStrategy,
       _offset_start: Offset,
-    ) -> Result<Pin<Box<dyn ConsumerStream<Item = Result<ConsumerRecord, ErrorCode>> + Send>>> {
+    ) -> Result<ConsumerStreamed> {
       let mut batch = Batch::new();
       self
         .record_values

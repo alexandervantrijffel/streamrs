@@ -7,6 +7,8 @@ use fluvio::{
 use fluvio_protocol::link::ErrorCode;
 use std::{pin::Pin, time::Duration};
 
+pub type ConsumerStreamSend = Pin<Box<dyn ConsumerStream<Item = Result<ConsumerRecord, ErrorCode>> + Send>>;
+
 #[async_trait]
 pub trait Consumer: Send + Sync {
   async fn consume(
@@ -15,7 +17,7 @@ pub trait Consumer: Send + Sync {
     consumer_name: &str,
     offset_strategry: OffsetManagementStrategy,
     offset_start: Offset,
-  ) -> Result<Pin<Box<dyn ConsumerStream<Item = Result<ConsumerRecord, ErrorCode>> + Send>>>;
+  ) -> Result<ConsumerStreamSend>;
 }
 
 pub struct FluvioConsumer {}
@@ -28,7 +30,7 @@ impl Consumer for FluvioConsumer {
     consumer_name: &str,
     offset_strategry: OffsetManagementStrategy,
     offset_start: Offset,
-  ) -> Result<Pin<Box<dyn ConsumerStream<Item = Result<ConsumerRecord, ErrorCode>> + Send>>> {
+  ) -> Result<ConsumerStreamSend> {
     Ok(Box::pin(
       Fluvio::connect()
         .await?
