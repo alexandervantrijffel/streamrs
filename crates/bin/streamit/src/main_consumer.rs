@@ -123,7 +123,7 @@ async fn receiver<TPinger: Pinger + 'static, TConsumer: Consumer + 'static>(
       Offset::beginning(),
     )
     .await
-    .unwrap();
+    .context("Failed to create consumer stream")?;
 
   while let Some(msg) = stream.next().await {
     match msg {
