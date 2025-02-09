@@ -1,6 +1,7 @@
 #[cfg(test)]
 pub mod tests {
   use crate::consumer::Consumer;
+  use anyhow::Result;
   use async_trait::async_trait;
   use fluvio::consumer::{OffsetManagementStrategy, Record as ConsumerRecord};
   use fluvio::{consumer::ConsumerStream, Offset};
@@ -35,7 +36,7 @@ pub mod tests {
       _consumer_name: &str,
       _offset_strategry: OffsetManagementStrategy,
       _offset_start: Offset,
-    ) -> Result<Pin<Box<dyn ConsumerStream<Item = Result<ConsumerRecord, ErrorCode>> + Send>>, anyhow::Error> {
+    ) -> Result<Pin<Box<dyn ConsumerStream<Item = Result<ConsumerRecord, ErrorCode>> + Send>>> {
       let mut batch = Batch::new();
       self
         .record_values

@@ -110,7 +110,7 @@ async fn receiver<TPinger: Pinger + 'static, TConsumer: Consumer + 'static>(
   tx: &Sender<(ConsumerRecord, oneshot::Sender<()>)>,
   pinger: Arc<TPinger>,
   consumer: Arc<TConsumer>,
-) -> anyhow::Result<()> {
+) -> Result<()> {
   let mut stream = consumer
     .clone()
     .consume(
@@ -156,7 +156,7 @@ async fn receiver<TPinger: Pinger + 'static, TConsumer: Consumer + 'static>(
   Ok(())
 }
 
-fn handle_message(record: &ConsumerRecord, msg_processed_tx: oneshot::Sender<()>) -> anyhow::Result<()> {
+fn handle_message(record: &ConsumerRecord, msg_processed_tx: oneshot::Sender<()>) -> Result<()> {
   let data = record.value();
   let wrapper = MessageWrapper::decode_borrowed(data).context("Failed to decode message")?;
 
@@ -190,7 +190,7 @@ pub enum ConsumerError {
   CloseRequested(String),
 }
 
-async fn handle_signals() -> anyhow::Result<()> {
+async fn handle_signals() -> Result<()> {
   let mut signal_terminate = signal(SignalKind::terminate())?;
   let mut signal_interrupt = signal(SignalKind::interrupt())?;
 

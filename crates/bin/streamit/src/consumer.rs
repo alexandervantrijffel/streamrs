@@ -1,3 +1,4 @@
+use anyhow::Result;
 use async_trait::async_trait;
 use fluvio::{
   consumer::{ConsumerConfigExtBuilder, ConsumerStream, OffsetManagementStrategy, Record as ConsumerRecord},
@@ -14,7 +15,7 @@ pub trait Consumer: Send + Sync {
     consumer_name: &str,
     offset_strategry: OffsetManagementStrategy,
     offset_start: Offset,
-  ) -> std::result::Result<Pin<Box<dyn ConsumerStream<Item = Result<ConsumerRecord, ErrorCode>> + Send>>, anyhow::Error>;
+  ) -> Result<Pin<Box<dyn ConsumerStream<Item = Result<ConsumerRecord, ErrorCode>> + Send>>>;
 }
 
 pub struct FluvioConsumer {}
@@ -27,7 +28,7 @@ impl Consumer for FluvioConsumer {
     consumer_name: &str,
     offset_strategry: OffsetManagementStrategy,
     offset_start: Offset,
-  ) -> Result<Pin<Box<dyn ConsumerStream<Item = Result<ConsumerRecord, ErrorCode>> + Send>>, anyhow::Error> {
+  ) -> Result<Pin<Box<dyn ConsumerStream<Item = Result<ConsumerRecord, ErrorCode>> + Send>>> {
     Ok(Box::pin(
       Fluvio::connect()
         .await?
