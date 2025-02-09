@@ -9,7 +9,6 @@ use fluvio::{
   consumer::{OffsetManagementStrategy, Record as ConsumerRecord},
   Offset,
 };
-use futures::StreamExt;
 use std::{sync::Arc, time::Duration};
 use streamitlib::{
   configure_tracing::init,

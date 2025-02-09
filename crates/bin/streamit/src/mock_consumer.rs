@@ -1,6 +1,6 @@
 #[cfg(test)]
 pub mod tests {
-  use crate::consumer::{Consumer, ConsumerStreamed};
+  use crate::consumer::{Consumer, FluvioStreamer};
   use anyhow::Result;
   use async_trait::async_trait;
   use fluvio::consumer::{OffsetManagementStrategy, Record as ConsumerRecord};
@@ -35,7 +35,7 @@ pub mod tests {
       _consumer_name: &str,
       _offset_strategry: OffsetManagementStrategy,
       _offset_start: Offset,
-    ) -> Result<ConsumerStreamed> {
+    ) -> Result<FluvioStreamer> {
       let mut batch = Batch::new();
       self
         .record_values
@@ -50,7 +50,8 @@ pub mod tests {
         // inner: stream::iter(vec![Ok(record)]),
         inner: stream::iter(batch.into_consumer_records_iter(0).map(Ok)),
       };
-      Ok(Box::pin(stream))
+
+      Ok(FluvioStreamer::new(Box::pin(stream)))
     }
   }
 

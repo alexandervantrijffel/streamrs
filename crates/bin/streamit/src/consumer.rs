@@ -5,6 +5,7 @@ use fluvio::{
   Fluvio, Offset,
 };
 use fluvio_protocol::link::ErrorCode;
+use futures::{stream::Next, StreamExt};
 use std::{pin::Pin, time::Duration};
 
 pub type ConsumerStreamSend = Pin<Box<dyn ConsumerStream<Item = Result<ConsumerRecord, ErrorCode>> + Send>>;
@@ -17,7 +18,7 @@ pub trait Consumer: Send + Sync {
     consumer_name: &str,
     offset_strategry: OffsetManagementStrategy,
     offset_start: Offset,
-  ) -> Result<ConsumerStreamSend>;
+  ) -> Result<FluvioStreamer>;
 }
 
 pub struct FluvioConsumer {}
@@ -30,8 +31,8 @@ impl Consumer for FluvioConsumer {
     consumer_name: &str,
     offset_strategry: OffsetManagementStrategy,
     offset_start: Offset,
-  ) -> Result<ConsumerStreamSend> {
-    Ok(Box::pin(
+  ) -> Result<FluvioStreamer> {
+    Ok(FluvioStreamer::new(Box::pin(
       Fluvio::connect()
         .await?
         .consumer_with_config(
@@ -45,6 +46,26 @@ impl Consumer for FluvioConsumer {
             .build()?,
         )
         .await?,
-    ))
+    )))
+  }
+}
+
+pub struct FluvioStreamer {
+  stream: ConsumerStreamSend,
+}
+
+impl FluvioStreamer {
+  pub fn new(stream: ConsumerStreamSend) -> Self {
+    Self { stream }
+  }
+
+  pub fn next(&mut self) -> Next<'_, ConsumerStreamSend> {
+    self.stream.next()
+  }
+  pub fn offset_commit(&mut self) -> std::result::Result<(), ErrorCode> {
+    self.stream.offset_commit()
+  }
+  pub async fn offset_flush(&mut self) -> std::result::Result<(), ErrorCode> {
+    self.stream.offset_flush().await
   }
 }
