@@ -1,3 +1,5 @@
+#![allow(tail_expr_drop_order)]
+#![allow(if_let_rescope)]
 mod consumer;
 mod mock_consumer;
 
@@ -124,8 +126,8 @@ async fn receiver<TPinger: Pinger + 'static, TConsumer: Consumer + 'static>(
     .await
     .context("Failed to create consumer stream")?;
 
-  while let Some(msg) = stream.next().await {
-    match msg {
+  while let Some(next) = stream.next().await {
+    match next {
       Ok(msg) => {
         let (msg_processed_tx, msg_processed_rx) = oneshot::channel::<()>();
         if let Err(e) = tx.send((msg, msg_processed_tx)).await {
@@ -133,13 +135,19 @@ async fn receiver<TPinger: Pinger + 'static, TConsumer: Consumer + 'static>(
           continue;
         }
 
-        match msg_processed_rx.await {
+        let msg_processed = msg_processed_rx.await;
+
+        match msg_processed {
           Ok(()) => {
             trace!("receiver: committing offset");
-            if let Err(e) = stream.offset_commit() {
+            let committed = stream.offset_commit();
+            if let Err(e) = committed {
               error!("Failed to commit offset: {e}");
-              // todo perf: flushing offsets can be improved by batching
-            } else if let Err(e) = stream.offset_flush().await {
+              continue;
+            }
+            // todo perf: flushing offsets can be improved by batching
+            let flushed = stream.offset_flush().await;
+            if let Err(e) = flushed {
               error!("Failed to flush offset: {e}");
             }
           }
