@@ -33,3 +33,6 @@ incremental = true # shorten hot local builds duration
 
 [workspace.metadata]
 deny-unsafe-code = true
+
+[workspace.lints.rust]
+rust-2024-compatibility = "warn"

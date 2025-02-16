@@ -33,3 +33,6 @@ path = "src/main_producer.rs"
 [[bin]]
 name = "consumer"
 path = "src/main_consumer.rs"
+
+[lints]
+workspace = true
