@@ -173,19 +173,19 @@ fn handle_message(record: &ConsumerRecord, msg_processed_tx: oneshot::Sender<()>
 
   let result = match wrapper.kind {
     MessageKind::Birth(birth) => {
-      debug!("Received Birth: {:?}", birth);
+      debug!("Received Birth: {birth:?}");
       Ok(())
     }
     MessageKind::Marriage(marriage) => {
-      debug!("Received Marriage: {:?}", marriage);
+      debug!("Received Marriage: {marriage:?}");
       Ok(())
     }
     MessageKind::CloseConsumers(reason) => {
-      debug!("Received CloseServer: {:?}", reason);
+      debug!("Received CloseServer: {reason:?}");
       Err(ConsumerError::CloseRequested(reason).into())
     }
     MessageKind::None => {
-      error!("Received None. Data: {:?}", data);
+      error!("Received None. Data: {data:?}");
       Ok(())
     }
   };
@@ -238,7 +238,7 @@ mod tests {
       MessageWrapper::new_close_server(),
     ]
     .iter()
-    .map(|m| m.encode_to_bytes())
+    .map(bilrost::Message::encode_to_bytes)
     .collect();
     let consumer_mock = Arc::new(MockConsumer::new(records));
 

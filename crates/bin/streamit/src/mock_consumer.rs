@@ -4,10 +4,10 @@ pub mod tests {
   use anyhow::Result;
   use async_trait::async_trait;
   use fluvio::consumer::{OffsetManagementStrategy, Record as ConsumerRecord};
-  use fluvio::{Offset, consumer::ConsumerStream};
+  use fluvio::{consumer::ConsumerStream, Offset};
   use fluvio_protocol::link::ErrorCode;
   use fluvio_protocol::record::{Batch, Record, RecordData};
-  use futures::{Stream, stream};
+  use futures::{stream, Stream};
   use std::task::ready;
 
   // Mock Consumer that emits all records in record_values without a delay
