@@ -56,24 +56,31 @@ async fn main_consumer<TPinger: Pinger + 'static, TConsumer: Consumer + 'static>
     }
   });
 
+  let mut signal_terminate = signal(SignalKind::terminate())?;
+  let mut signal_interrupt = signal(SignalKind::interrupt())?;
+
   let mut recv_task = tokio::spawn(async move {
     loop {
       tokio::select! {
           Some((record,msg_processed_tx)) = new_msg_rx.recv() => {
               if let Err(e) = handle_message(&record,msg_processed_tx) {
-                  match e.downcast_ref::<ConsumerError>() {
-                      Some(ConsumerError::CloseRequested(reason)) => {
-                          info!("Close consumers requested: {reason}");
-                          break;
-                      }
-                      None => {
-                          error!("Failed to handle message: {e}");
-                      }
-                  }
+                    if let Some(ConsumerError::CloseRequested(reason)) = e.downcast_ref::<ConsumerError>() {
+                        info!("Consumer close requested: {reason}");
+                        break;
+                    }
+                    error!("Message handling failed with error: {e:?}");
               }
           }
 
           () = sleep(Duration::from_secs(10)) => trace!("No new messages after 10s"),
+
+          _ = signal_terminate.recv() => {
+              break;
+          }
+
+          _ = signal_interrupt.recv() => {
+              break;
+          }
 
           _ = handle_signals() => {
               break;
@@ -195,18 +202,6 @@ fn handle_message(record: &ConsumerRecord, msg_processed_tx: oneshot::Sender<()>
 pub enum ConsumerError {
   #[error("CloseServer request received with reason: {0}")]
   CloseRequested(String),
-}
-
-async fn handle_signals() -> Result<()> {
-  let mut signal_terminate = signal(SignalKind::terminate())?;
-  let mut signal_interrupt = signal(SignalKind::interrupt())?;
-
-  tokio::select! {
-      _ = signal_terminate.recv() => debug!("Received SIGTERM."),
-      _ = signal_interrupt.recv() => debug!("Received SIGINT."),
-  };
-
-  Ok(())
 }
 
 #[cfg(test)]
