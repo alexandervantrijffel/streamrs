@@ -81,10 +81,6 @@ async fn main_consumer<TPinger: Pinger + 'static, TConsumer: Consumer + 'static>
           _ = signal_interrupt.recv() => {
               break;
           }
-
-          _ = handle_signals() => {
-              break;
-          }
       };
     }
   });
@@ -94,6 +90,7 @@ async fn main_consumer<TPinger: Pinger + 'static, TConsumer: Consumer + 'static>
       _ = (&mut ingest_task) => ingest_task.abort(),
       _ = (&mut recv_task) => recv_task.abort(),
   };
+
   sleep(Duration::from_secs(1)).await;
 
   Ok(())

@@ -12,7 +12,6 @@ use tracing::{debug, error, info};
 async fn main() {
   _ = init();
   info!("Starting Producer");
-  #[allow(if_let_rescope)]
   if let Err(e) = producer().await {
     error!("Unexpected error: {:?}", e);
   }

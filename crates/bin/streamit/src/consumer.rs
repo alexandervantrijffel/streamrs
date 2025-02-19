@@ -1,11 +1,11 @@
 use anyhow::Result;
 use async_trait::async_trait;
 use fluvio::{
-  consumer::{ConsumerConfigExtBuilder, ConsumerStream, OffsetManagementStrategy, Record as ConsumerRecord},
   Fluvio, Offset,
+  consumer::{ConsumerConfigExtBuilder, ConsumerStream, OffsetManagementStrategy, Record as ConsumerRecord},
 };
 use fluvio_protocol::link::ErrorCode;
-use futures::{stream::Next, StreamExt};
+use futures::{StreamExt, stream::Next};
 use std::{pin::Pin, time::Duration};
 
 pub type ConsumerStreamSend = Pin<Box<dyn ConsumerStream<Item = Result<ConsumerRecord, ErrorCode>> + Send>>;

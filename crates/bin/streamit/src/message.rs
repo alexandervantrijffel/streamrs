@@ -58,9 +58,9 @@ impl Birth {
 #[cfg(test)]
 pub mod tests {
   use super::*;
+  use Birth;
   use bilrost::{BorrowedMessage, Message};
   use tokio::test;
-  use Birth;
 
   #[test]
   pub async fn test_serialize_roundtrip() {
