@@ -1,3 +1,4 @@
 fluvio-data/**
 fluvio-metadata/**
 rustc*.txt
+Cargo.lock
