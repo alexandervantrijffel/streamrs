@@ -3,3 +3,6 @@ rustflags = ["-C", "target-cpu=native", "-W", "clippy::all", "-W", "clippy::peda
 
 [target.x86_64-unknown-linux-gnu]
 rustflags = ["-C", "target-cpu=native", "-W", "clippy::all", "-W", "clippy::pedantic", "-W", "clippy::nursery", "-W", "clippy::cargo", "-A", "clippy::cargo_common_metadata", "-A", "clippy::redundant_pub_crate", "-A", "clippy::missing_errors_doc", "-A", "clippy::allow-attributes"]
+
+[build]
+rustflags = ["-Clink-arg=-fuse-ld=lld", "-Zthreads=12", "-Ctarget-cpu=native"]

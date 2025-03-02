@@ -19,17 +19,18 @@ tracing-subscriber = {version = "0", features = ["env-filter"]}
 tracing-test = "0"
 
 [profile.dev]
-opt-level = 0 # Disable optimizations and reduce the compile time
 split-debuginfo = "unpacked" # improve compilation performance by using unpacked debug symbols
-debug=true
+debug=0
 
+# optimized with `cargo wizard apply fast-runtime release`
+# consider using the cargo-pgo subcommand to further optimize the binary
 [profile.release]
-lto = false # Disable link-time optimization to reduce build time
-codegen-units = 64 # Reduce number of codegen units to increase optimizations
+lto = true # Disable link-time optimization to reduce build time
+codegen-units = 1 # Reduce number of codegen units to increase optimizations
 panic = 'abort'
 # strip = true # Strip symbols from binary*
 # opt-level = 3 # All optimizations
-incremental = true # shorten hot local builds duration
+incremental = false
 
 [workspace.metadata]
 deny-unsafe-code = true

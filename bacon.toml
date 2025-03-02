@@ -10,7 +10,6 @@ clear = false # Keep output on screen
 display = "always" # Ensure output is displayed
 command = [
   "cargo",
-  "+nightly",
   "nextest",
   "run",
   "--all-features",
@@ -31,9 +30,7 @@ command = [
 [jobs.run-producer]
 command = [
   "cargo",
-  "+nightly",
   "run",
-  "-Zcodegen-backend",
   "--all-features",
   # put launch parameters for your program behind a `--` separator
   "-p",
@@ -57,9 +54,7 @@ ignore = ["**/generated_at_build.rs"]
 [jobs.run-consumer]
 command = [
   "cargo",
-  "+nightly",
   "run",
-  "-Zcodegen-backend",
   "--all-features",
   # put launch parameters for your program behind a `--` separator
   "-p",
