@@ -60,8 +60,8 @@ pub mod tests {
   }
 
   impl<T: Stream<Item = Result<ConsumerRecord, ErrorCode>> + Unpin> ConsumerStream for SinglePartitionConsumerStream<T> {
-    fn offset_commit(&mut self) -> std::result::Result<(), ErrorCode> {
-      Ok(())
+    fn offset_commit(&mut self) -> futures::future::BoxFuture<'_, std::result::Result<(), ErrorCode>> {
+      Box::pin(async { Ok(()) })
     }
 
     fn offset_flush(&mut self) -> futures::future::BoxFuture<'_, std::result::Result<(), ErrorCode>> {

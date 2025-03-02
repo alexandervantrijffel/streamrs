@@ -144,8 +144,7 @@ async fn receiver<TPinger: Pinger + 'static, TConsumer: Consumer + 'static>(
         match msg_processed {
           Ok(()) => {
             trace!("receiver: committing offset");
-            let committed = stream.offset_commit();
-            if let Err(e) = committed {
+            if let Err(e) = stream.offset_commit().await {
               error!("Failed to commit offset: {e}");
               continue;
             }
@@ -205,7 +204,6 @@ pub enum ConsumerError {
 mod tests {
   use super::*;
   use crate::mock_consumer::tests::MockConsumer;
-  use bilrost::Message;
   use std::sync::atomic::{AtomicBool, Ordering};
   use streamitlib::message::Birth;
   use tracing_test::traced_test;

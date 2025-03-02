@@ -62,8 +62,8 @@ impl FluvioStreamer {
   pub fn next(&mut self) -> Next<'_, ConsumerStreamSend> {
     self.stream.next()
   }
-  pub fn offset_commit(&mut self) -> std::result::Result<(), ErrorCode> {
-    self.stream.offset_commit()
+  pub async fn offset_commit(&mut self) -> std::result::Result<(), ErrorCode> {
+    self.stream.offset_commit().await
   }
   pub async fn offset_flush(&mut self) -> std::result::Result<(), ErrorCode> {
     self.stream.offset_flush().await
